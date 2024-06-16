@@ -8,9 +8,13 @@ import threading
 import time
 import json
 import os
+import board
+import adafruit_dht
+
+# Initial the dht device, with data pin connected to:
+dhtDevice = adafruit_dht.DHT11(board.D4)
 
 received_all_event = threading.Event()
-
 target_ep = 'alylqcewl13i8-ats.iot.ap-southeast-1.amazonaws.com'
 thing_name = 'ThinPi'
 cert_filepath = './certificate/certificate.pem'
@@ -19,32 +23,6 @@ ca_filepath = './certificate/AmazonRootCA1.pem'
 
 pub_topic = 'device/{}/data'.format(thing_name)
 sub_topic = 'app/data'
-
-# Callback when connection is accidentally lost.
-def on_connection_interrupted(connection, error, **kwargs):
-    print("Connection interrupted. error: {}".format(error))
-
-
-# Callback when an interrupted connection is re-established.
-def on_connection_resumed(connection, return_code, session_present, **kwargs):
-    print("Connection resumed. return_code: {} session_present: {}".format(return_code, session_present))
-
-    if return_code == mqtt.ConnectReturnCode.ACCEPTED and not session_present:
-        print("Session did not persist. Resubscribing to existing topics...")
-        resubscribe_future, _ = connection.resubscribe_existing_topics()
-
-        # Cannot synchronously wait for resubscribe result because we're on the connection's event-loop thread,
-        # evaluate result with a callback instead.
-        resubscribe_future.add_done_callback(on_resubscribe_complete)
-
-
-def on_resubscribe_complete(resubscribe_future):
-    resubscribe_results = resubscribe_future.result()
-    print("Resubscribe results: {}".format(resubscribe_results))
-
-    for topic, qos in resubscribe_results['topics']:
-        if qos is None:
-            sys.exit("Server rejected resubscribe to topic: {}".format(topic))
                 
 # Callback when the subscribed topic receives a message
 def on_message_received(topic, payload, dup, qos, retain, **kwargs):
@@ -64,21 +42,17 @@ mqtt_connection = mqtt_connection_builder.mtls_from_path(
     pri_key_filepath=private_key_filepath,
     client_bootstrap=client_bootstrap,
     ca_filepath=ca_filepath,
-    on_connection_interrupted=on_connection_interrupted,
-    on_connection_resumed=on_connection_resumed,
     client_id=thing_name,
     clean_session=True,
     keep_alive_secs=30,
     http_proxy_options=proxy_options)
 
-print("Connecting to {} with client ID '{}'...".format(
-    target_ep, thing_name))
-
+print("Connecting to {} with client ID '{}'...".format(target_ep, thing_name))
+info = os.uname()
 #Connect to the gateway
 while True:
   try:
     connect_future = mqtt_connection.connect()
-# Future.result() waits until a result is available
     connect_future.result()
   except:
     print("Connection to IoT Core failed...  retrying in 5s.")
@@ -100,14 +74,39 @@ print("Subscribed with {}".format(str(subscribe_result['qos'])))
 
 while True:
     print ('Publishing message on topic {}'.format(pub_topic))
-    
-    hello_world_message = {
-        'message' : 'Hello from {} in the AWS IoT Workshop'.format(thing_name)
-    }
-    
-    message_json = json.dumps(hello_world_message)
-    mqtt_connection.publish(
+    print ("===============")
+
+    try:
+        # Print the values to the serial port
+        temperature_c = dhtDevice.temperature
+        temperature_f = temperature_c * (9 / 5) + 32
+        humidity = dhtDevice.humidity
+        print(
+            "Temp: {:.1f} F / {:.1f} C    Humidity: {}% ".format(
+                temperature_f, temperature_c, humidity
+            )
+        )
+        data = ({
+            "sensors": {
+                "temperature_f": round(temperature_f,1),
+                "temperature_c": round(temperature_c,1),
+                "humidity": humidity,
+            },
+            "status": "online",
+        })
+        
+        mqtt_connection.publish(
         topic=pub_topic,
-        payload=message_json,
+        payload=json.dumps(data),
         qos=mqtt.QoS.AT_LEAST_ONCE)
+
+    except RuntimeError as error:
+        # Errors happen fairly often, DHT's are hard to read, just keep going
+        print(error.args[0])
+        time.sleep(5)
+        continue
+    except Exception as error:
+        dhtDevice.exit()
+        raise error
+
     time.sleep(5)
