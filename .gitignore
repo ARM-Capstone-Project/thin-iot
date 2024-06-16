@@ -1,0 +1,84 @@
+# Ignore Python bytecode and cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Ignore virtual environments
+venv/
+ENV/
+env/
+*.env
+.venv/
+.VENV/
+ENV/
+env.bak/
+
+# Ignore system-specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Ignore editor and IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+*.bak
+
+# Ignore log files and databases
+*.log
+*.sqlite3
+*.db
+
+# Ignore compiled files
+*.o
+*.so
+*.out
+*.exe
+
+# Ignore temporary files
+*.tmp
+*.temp
+
+# Ignore build directories
+build/
+dist/
+*.egg-info/
+
+# Ignore certificates and keys
+certs/
+*.pem
+*.crt
+*.key
+*.der
+
+# Ignore configuration files that contain sensitive information
+config.yaml
+config.json
+*.config
+*.cfg
+
+# Ignore sensitive shell script outputs
+*.secret
+
+# Ignore specific tools outputs (if any)
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/
+
+# Ignore node_modules if using JavaScript/Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Ignore environment files
+.env
+.env.*.local
+
+# Ignore device-specific files
+/dev/
+
+# Ignore generated documentation
+/docs/_build/
