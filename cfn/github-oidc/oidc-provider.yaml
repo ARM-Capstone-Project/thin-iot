@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: 'GitHub OIDC: Provider - Deployed once into each account'
+
+Parameters:
+  GithubTokenThumbprint:
+    Type: String
+    Default: 1b511abead59c6ce207077c0bf0e0043b1382612
+
+Resources:
+  GithubOidc:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ThumbprintList:
+        - !Ref GithubTokenThumbprint
+      ClientIdList:
+        - sts.amazonaws.com

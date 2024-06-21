@@ -17,9 +17,9 @@ dhtDevice = adafruit_dht.DHT11(board.D4)
 received_all_event = threading.Event()
 target_ep = 'alylqcewl13i8-ats.iot.ap-southeast-1.amazonaws.com'
 thing_name = 'ThinPi'
-cert_filepath = './certificate/certificate.pem'
-private_key_filepath = './certificate/privatekey.pem'
-ca_filepath = './certificate/AmazonRootCA1.pem'
+cert_filepath = './../certs/certificate.pem'
+private_key_filepath = './../certs/privateKey.pem'
+ca_filepath = './../certs/AmazonRootCA1.pem'
 
 pub_topic = 'device/{}/data'.format(thing_name)
 sub_topic = 'app/data'
@@ -87,7 +87,8 @@ while True:
             )
         )
         data = ({
-            "sensors": {
+            "thing": thing_name,
+            "data": {
                 "temperature_f": round(temperature_f,1),
                 "temperature_c": round(temperature_c,1),
                 "humidity": humidity,
@@ -103,10 +104,10 @@ while True:
     except RuntimeError as error:
         # Errors happen fairly often, DHT's are hard to read, just keep going
         print(error.args[0])
-        time.sleep(5)
+        time.sleep(15)
         continue
     except Exception as error:
         dhtDevice.exit()
         raise error
 
-    time.sleep(5)
+    time.sleep(15)
