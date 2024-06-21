@@ -85,6 +85,7 @@ jobs:
         export AWS_REGION=${GREENGRASS_REGION}
         # Thing Group is the name of the branch
         export THING_GROUP=${GITHUB_REF#refs/heads/}
+        echo "THINGS GROUP : $THING_GROUP"
 
         CHANGED_COMPONENTS=$(git diff --name-only HEAD~1 HEAD | grep "^components/" | cut -d '/' -f 2)
 
