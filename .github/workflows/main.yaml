@@ -58,7 +58,7 @@ jobs:
 
       working-directory: ${{ env.working-directory }}
 
-  deploy:
+deploy:
     name: Component deploy
     runs-on: ubuntu-latest
     needs: publish
@@ -81,17 +81,20 @@ jobs:
 
     - name: Deploy Greengrass components
       run: |
-        export AWS_ACCOUNT_ID=$(aws sts get-caller-identity |  jq -r '.Account')
+        export AWS_ACCOUNT_ID=$(aws sts get-caller-identity | jq -r '.Account')
         export AWS_REGION=${GREENGRASS_REGION}
         # Thing Group is the name of the branch
         export THING_GROUP=${GITHUB_REF#refs/heads/}
 
         CHANGED_COMPONENTS=$(git diff --name-only HEAD~1 HEAD | grep "^components/" | cut -d '/' -f 2)
+        echo "Changed components: $CHANGED_COMPONENTS"
 
         if [ -z "$CHANGED_COMPONENTS" ]; then
           echo "No need to update deployment"
         else
           envsubst < "deployment.json.template" > "deployment.json"
+          echo "Initial deployment.json:"
+          cat deployment.json
 
           for component in $CHANGED_COMPONENTS
           do
@@ -101,9 +104,11 @@ jobs:
               --arn arn:aws:greengrass:${AWS_REGION}:${AWS_ACCOUNT_ID}:components:${component} \
               --query 'componentVersions[0].componentVersion')
 
-            jq '.components[$component].componentVersion = $version' --arg component $component --arg version $version deployment.json > "tmp" && mv "tmp" deployment.json
-
+            jq --arg component $component --arg version $version '.components[$component].componentVersion = $version' deployment.json > tmp.json && mv tmp.json deployment.json
           done
+          
+          echo "Final deployment.json:"
+          cat deployment.json
           
           # deploy
           aws greengrassv2 create-deployment \
