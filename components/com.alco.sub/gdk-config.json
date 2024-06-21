@@ -1,6 +1,6 @@
 {
     "component": {
-      "com.example.pub": {
+      "com.alco.sub": {
         "author": "Example",
         "version": "NEXT_PATCH",
         "build": {
