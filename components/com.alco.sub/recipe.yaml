@@ -1,6 +1,6 @@
 RecipeFormatVersion: "2020-01-25"
 ComponentName: "com.alco.sub"
-ComponentVersion: "1.0.0"
+ComponentVersion: "1.0.1"
 ComponentDescription: "A component that subscribes to temperature data from AWS IoT Core"
 ComponentPublisher: "thineikhaing"
 ComponentConfiguration:
