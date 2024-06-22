@@ -1,11 +1,15 @@
 {
-    "targetArn": "arn:aws:iot:$AWS_REGION:$AWS_ACCOUNT_ID:thinggroup/$THING_GROUP",
+    "targetArn": "arn:aws:iot:$AWS_REGION:$AWS_ACCOUNT_ID:thinggroup/RpiWorkshopGroup",
     "deploymentName": "Main deployment",
     "components": {
-        "com.alco.sub": {
-            "componentVersion": "LATEST",
+        "com.alco.pub": {
+            "componentVersion": "$LATEST_COMPONENT_VERSION",
             "runWith": {}
         },
+        "com.alco.sub": {
+            "componentVersion": "$LATEST_COMPONENT_VERSION",
+            "runWith": {}
+        }
     },
     "deploymentPolicies": {
         "failureHandlingPolicy": "ROLLBACK",

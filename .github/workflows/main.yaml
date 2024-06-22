@@ -57,6 +57,19 @@ jobs:
         done
 
       working-directory: ${{ env.working-directory }}
+      
+    - name: Get published version
+      id: gdk_version
+      run: |
+        export AWS_ACCOUNT_ID=$(aws sts get-caller-identity |  jq -r '.Account')
+        export AWS_REGION=${GREENGRASS_REGION}
+        export LATEST_COMPONENT_VERSION=$(aws greengrassv2 list-component-versions \
+          --output text \
+          --no-paginate \
+          --arn arn:aws:greengrass:${AWS_REGION}:${AWS_ACCOUNT_ID}:components:${GREENGRASS_COMPONENT_NAME} \
+          --query 'componentVersions[0].componentVersion')
+        
+        echo "version=${LATEST_COMPONENT_VERSION}" >> $GITHUB_OUTPUT
 
   deploy:
     name: Component deploy
@@ -81,35 +94,46 @@ jobs:
 
     - name: Deploy Greengrass components
       run: |
+        run: |
         export AWS_ACCOUNT_ID=$(aws sts get-caller-identity |  jq -r '.Account')
         export AWS_REGION=${GREENGRASS_REGION}
-        # Thing Group is the name of the branch
-        export THING_GROUP=RpiWorkshopGroup
-
-        CHANGED_COMPONENTS=$(git diff --name-only HEAD~1 HEAD | grep "^components/" | cut -d '/' -f 2)
-
-        if [ -z "$CHANGED_COMPONENTS" ]; then
-          echo "No need to update deployment"
-        else
-          envsubst < "deployment.json.template" > "deployment.json"
-
-          for component in $CHANGED_COMPONENTS
-          do
-            version=$(aws greengrassv2 list-component-versions \
-              --output text \
-              --no-paginate \
-              --arn arn:aws:greengrass:${AWS_REGION}:${AWS_ACCOUNT_ID}:components:${component} \
-              --query 'componentVersions[0].componentVersion')
-
-            jq '.components[$component].componentVersion = $version' --arg component $component --arg version $version deployment.json > "tmp" && mv "tmp" deployment.json
-
-          done
-          
-          # deploy
-          aws greengrassv2 create-deployment \
-            --cli-input-json file://deployment.json \
-            --region ${AWS_REGION}
-          echo "Deployment finished!"
-        fi
-
+        envsubst < "deployment.json.template" > "deployment.json"
+        aws greengrassv2 create-deployment \
+          --cli-input-json file://deployment.json \
+          --region ${AWS_REGION}
+        echo "Deployment finished!"
+      env:
+        LATEST_COMPONENT_VERSION: ${{needs.publish.outputs.published_version}}
       working-directory: ${{ env.working-directory }}
+        # export AWS_ACCOUNT_ID=$(aws sts get-caller-identity |  jq -r '.Account')
+        # export AWS_REGION=${GREENGRASS_REGION}
+        # # Thing Group is the name of the branch
+        # export THING_GROUP=RpiWorkshopGroup
+
+        # CHANGED_COMPONENTS=$(git diff --name-only HEAD~1 HEAD | grep "^components/" | cut -d '/' -f 2)
+
+        # if [ -z "$CHANGED_COMPONENTS" ]; then
+        #   echo "No need to update deployment"
+        # else
+        #   envsubst < "deployment.json.template" > "deployment.json"
+
+        #   for component in $CHANGED_COMPONENTS
+        #   do
+        #     version=$(aws greengrassv2 list-component-versions \
+        #       --output text \
+        #       --no-paginate \
+        #       --arn arn:aws:greengrass:${AWS_REGION}:${AWS_ACCOUNT_ID}:components:${component} \
+        #       --query 'componentVersions[0].componentVersion')
+
+        #     jq '.components[$component].componentVersion = $version' --arg component $component --arg version $version deployment.json > "tmp" && mv "tmp" deployment.json
+
+        #   done
+          
+        #   # deploy
+        #   aws greengrassv2 create-deployment \
+        #     --cli-input-json file://deployment.json \
+        #     --region ${AWS_REGION}
+        #   echo "Deployment finished!"
+        # fi
+
+      # working-directory: ${{ env.working-directory }}
