@@ -3,13 +3,13 @@
     "deploymentName": "Main deployment",
     "components": {
         "com.alco.pub": {
-            "componentVersion": "$LATEST_COMPONENT_VERSION",
+            "componentVersion": "LATEST",
             "runWith": {}
         },
         "com.alco.sub": {
-            "componentVersion": "$LATEST_COMPONENT_VERSION",
+            "componentVersion": "LATEST",
             "runWith": {}
-        }
+        },
     },
     "deploymentPolicies": {
         "failureHandlingPolicy": "ROLLBACK",
