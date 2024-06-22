@@ -36,27 +36,34 @@ jobs:
         aws-region: ${{ secrets.OIDC_ROLE_AWS_REGION }}
 
     - name: Install Greengrass Development Kit
-      run: pip install -U git+https://github.com/aws-greengrass/aws-greengrass-gdk-cli.git@v1.2.3
+      run: pip install -U git+https://github.com/aws-greengrass/aws-greengrass-gdk-cli.git@v1.1.0
 
-    - name: GDK Build and Publish
-      id: build_publish
-      run: |
-
-        CHANGED_COMPONENTS=$(git diff --name-only HEAD~1 HEAD | grep "^components/" | cut -d '/' -f 2)
-
-        echo "Components changed -> $CHANGED_COMPONENTS"        
-
-        for component in $CHANGED_COMPONENTS
-        do
-          cd $component
-          echo "Building $component ..."
-          gdk component build
-          echo "Publishing $component ..."
-          gdk component publish
-          cd ..
-        done
-
+    - name: GDK Build
+      run: gdk component build
       working-directory: ${{ env.working-directory }}
+
+    - name: GDK Publish
+      run: gdk component publish
+      working-directory: ${{ env.working-directory }}
+    # - name: GDK Build and Publish
+    #   id: build_publish
+    #   run: |
+
+    #     CHANGED_COMPONENTS=$(git diff --name-only HEAD~1 HEAD | grep "^components/" | cut -d '/' -f 2)
+
+    #     echo "Components changed -> $CHANGED_COMPONENTS"        
+
+    #     for component in $CHANGED_COMPONENTS
+    #     do
+    #       cd $component
+    #       echo "Building $component ..."
+    #       gdk component build
+    #       echo "Publishing $component ..."
+    #       gdk component publish
+    #       cd ..
+    #     done
+
+    #   working-directory: ${{ env.working-directory }}
       
     - name: Get published version
       id: gdk_version
