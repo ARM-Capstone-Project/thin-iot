@@ -1,15 +1,15 @@
 {
     "targetArn": "arn:aws:iot:$AWS_REGION:$AWS_ACCOUNT_ID:thinggroup/$THING_GROUP",
     "deploymentName": "Main deployment",
-    "components": {
-        "com.alco.pub": {
-            "componentVersion": "LATEST",
-            "runWith": {}
-        },
+"components": {
         "com.alco.sub": {
             "componentVersion": "LATEST",
             "runWith": {}
         },
+        "com.alco.pub": {
+            "componentVersion": "LATEST",
+            "runWith": {}
+        }
     },
     "deploymentPolicies": {
         "failureHandlingPolicy": "ROLLBACK",
