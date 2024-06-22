@@ -7,7 +7,7 @@
             "runWith": {}
         },
         "com.alco.pub": {
-            "componentVersion": "LATEST",
+            "componentVersion": "1.0.0",
             "runWith": {}
         }
     },
