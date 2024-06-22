@@ -2,6 +2,10 @@
     "targetArn": "arn:aws:iot:$AWS_REGION:$AWS_ACCOUNT_ID:thinggroup/$THING_GROUP",
     "deploymentName": "Main deployment",
     "components": {
+        "com.alco.pub": {
+            "componentVersion": "LATEST",
+            "runWith": {}
+        },
         "com.alco.sub": {
             "componentVersion": "LATEST",
             "runWith": {}

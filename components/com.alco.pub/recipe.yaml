@@ -1,0 +1,23 @@
+RecipeFormatVersion: "2020-01-25"
+ComponentName: "com.alco.pub"
+ComponentVersion: "1.0.0"
+ComponentDescription: "A component that publishes temperature data to AWS IoT Core"
+ComponentPublisher: "thineikhaing"
+ComponentConfiguration:
+  DefaultConfiguration:
+    accessControl:
+      aws.greengrass.ipc.mqttproxy:
+        'com.alco.pub:mqttproxy:1':
+          policyDescription: Allows access to publish to the temperature topic.
+          operations:
+            - aws.greengrass#PublishToTopic
+          resources:
+            - '*'
+Manifests:
+  - Platform:
+      os: all
+    Artifacts:
+      - URI: "s3://greengrass-component-artifacts-654654435122/com.alco.pub/1.0.1/com.alco.pub.zip" 
+        Unarchive: ZIP
+    Lifecycle:
+      Run: "python3 -u {artifacts:decompressedPath}/com.alco.pub/main.py"

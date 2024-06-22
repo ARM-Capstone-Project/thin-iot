@@ -1,6 +1,6 @@
 {
     "component": {
-      "com.alco.sub": {
+      "com.alco.pub": {
         "author": "thineikhaing",
         "version": "NEXT_PATCH",
         "build": {
