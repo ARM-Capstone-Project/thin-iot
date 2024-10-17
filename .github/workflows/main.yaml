@@ -83,35 +83,13 @@ jobs:
       run: |
         export AWS_ACCOUNT_ID=$(aws sts get-caller-identity |  jq -r '.Account')
         export AWS_REGION=${GREENGRASS_REGION}
-        # Thing Group is the name of the branch
-        export THING_GROUP=${GITHUB_REF#refs/heads/}
 
-        CHANGED_COMPONENTS=$(git diff --name-only HEAD~1 HEAD | grep "^components/" | cut -d '/' -f 2 | uniq)
+        envsubst < "deployment.json.template" > "deployment.json"
 
-        echo "Components changed -> $CHANGED_COMPONENTS"
-        
-        if [ -z "$CHANGED_COMPONENTS" ]; then
-          echo "No need to update deployment"
-        else
-          envsubst < "deployment.json.template" > "deployment.json"
-
-          for component in $CHANGED_COMPONENTS
-          do
-            version=$(aws greengrassv2 list-component-versions \
-              --output text \
-              --no-paginate \
-              --arn arn:aws:greengrass:${AWS_REGION}:${AWS_ACCOUNT_ID}:components:${component} \
-              --query 'componentVersions[0].componentVersion')
-
-            jq '.components[$component].componentVersion = $version' --arg component $component --arg version $version deployment.json > "tmp" && mv "tmp" deployment.json
-
-          done
-          
-          # deploy
-          aws greengrassv2 create-deployment \
-            --cli-input-json file://deployment.json \
-            --region ${AWS_REGION}
-          echo "Deployment finished!"
-        fi
+        # deploy
+        aws greengrassv2 create-deployment \
+          --cli-input-json file://deployment.json \
+          --region ${AWS_REGION}
+        echo "Deployment finished!"
 
       working-directory: ${{ env.working-directory }}
