@@ -48,12 +48,16 @@ jobs:
 
         for component in $CHANGED_COMPONENTS
         do
-          cd $component
-          echo "Building $component ..."
-          gdk component build
-          echo "Publishing $component ..."
-          gdk component publish
-          cd ..
+          if [ -d "$component" ]; then
+            cd $component
+            echo "Building $component ..."
+            gdk component build
+            echo "Publishing $component ..."
+            gdk component publish
+            cd ..
+          else
+              echo "Skipping $component because it is not a directory."
+          fi
         done
 
       working-directory: ${{ env.working-directory }}
