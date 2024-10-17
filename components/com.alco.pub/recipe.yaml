@@ -1,6 +1,6 @@
 RecipeFormatVersion: "2020-01-25"
 ComponentName: "com.alco.pub"
-ComponentVersion: "1.0.0"
+ComponentVersion: "1.0.1"
 ComponentDescription: "A component that publishes temperature data to AWS IoT Core"
 ComponentPublisher: "thineikhaing"
 ComponentConfiguration:

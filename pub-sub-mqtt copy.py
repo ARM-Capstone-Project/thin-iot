@@ -10,8 +10,7 @@ import json
 import os
 import board
 import adafruit_dht
-from datetime import datetime
-import random
+import datetime
 
 # Initial the dht device, with data pin connected to:
 dhtDevice = adafruit_dht.DHT11(board.D17)
@@ -23,8 +22,7 @@ cert_filepath = './../certs/certificate.pem'
 private_key_filepath = './../certs/privateKey.pem'
 ca_filepath = './../certs/AmazonRootCA1.pem'
 
-# pub_topic = 'device/{}/data'.format(thing_name)
-pub_topic = 'raspi/data'
+pub_topic = 'device/{}/data'.format(thing_name)
 sub_topic = 'app/data'
                 
 # Callback when the subscribed topic receives a message
@@ -74,56 +72,46 @@ subscribe_future, packet_id = mqtt_connection.subscribe(
 
 subscribe_result = subscribe_future.result()
 print("Subscribed with {}".format(str(subscribe_result['qos'])))
-# current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 while True:
     print ('Publishing message on topic {}'.format(pub_topic))
     print ("===============")
 
-
-
     try:
-
-        temperature_c = round(random.uniform(20.0, 30.0), 1)  # Temperature between 20°C and 30°C
-        temperature_f = round(temperature_c * (9 / 5) + 32, 1)  # Convert to Fahrenheit
-        humidity = round(random.uniform(40.0, 70.0), 1)  # Humidity between 40% and 70%
-
-        # temperature_c = dhtDevice.temperature
-        # temperature_f = temperature_c * (9 / 5) + 32
-        # humidity = dhtDevice.humidity
+        # Print the values to the serial port
+        temperature_c = dhtDevice.temperature
+        temperature_f = temperature_c * (9 / 5) + 32
+        humidity = dhtDevice.humidity
         
-        # Prepare the JSON format
-        reading = {
-            "deviceId": "DHT22-002",
-            "timestamp": datetime.utcnow().isoformat() + "Z",  # UTC timestamp
-            "readings": [
-                {
-                    "sensor": "temperature",
-                    "unit": "celsius",
-                    "value": temperature_c
-                },
-                {
-                    "sensor": "temperature",
-                    "unit": "fahrenheit",
-                    "value": temperature_f
-                },
-                {
-                    "sensor": "humidity",
-                    "unit": "percentage",
-                    "value": humidity
-                }
-            ]
-        }
+        print(
+            "Temp: {:.1f} F / {:.1f} C    Humidity: {}% ".format(
+                temperature_f, temperature_c, humidity
+            )
+        )
+        # Get current date and time
+       
+        # current_time = datetime.datetime.now().isoformat()
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        data = ({
+            "thing": thing_name,
+            "deviceID":  "dht11",
+            "humidity": humidity,
+            "timestamp": current_time,
+            "temperature_f": round(temperature_f,1),
+            "temperature_c": round(temperature_c,1),
+            "data": {
+                "temperature_f": round(temperature_f,1),
+                "temperature_c": round(temperature_c,1),
+                "humidity": humidity,
+                "timestamp": current_time,
+            },
+            "status": "online",
+        })
         
         mqtt_connection.publish(
         topic=pub_topic,
-        payload=json.dumps(reading),
+        payload=json.dumps(data),
         qos=mqtt.QoS.AT_LEAST_ONCE)
-
-        print(
-        "Temp: {:.1f} F / {:.1f} C    Humidity: {}% ".format(
-            temperature_c, temperature_f, humidity
-        )
-        )
 
     except RuntimeError as error:
         # Errors happen fairly often, DHT's are hard to read, just keep going
@@ -134,4 +122,4 @@ while True:
         dhtDevice.exit()
         raise error
 
-    time.sleep(3.0)
+    time.sleep(5)
