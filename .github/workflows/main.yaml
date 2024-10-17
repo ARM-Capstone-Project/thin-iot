@@ -42,7 +42,7 @@ jobs:
       id: build_publish
       run: |
 
-        CHANGED_COMPONENTS=$(git diff --name-only HEAD~1 HEAD | grep "^components/" | cut -d '/' -f 2)
+        CHANGED_COMPONENTS=$(git diff --name-only HEAD~1 HEAD | grep "^components/" | cut -d '/' -f 2 | uniq)
 
         echo "Components changed -> $CHANGED_COMPONENTS"        
 
