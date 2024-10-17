@@ -1,14 +1,12 @@
 {
     "targetArn": "arn:aws:iot:$AWS_REGION:$AWS_ACCOUNT_ID:thinggroup/RpiWorkshopGroup",
-    "deploymentName": "Main deployment",
+    "deploymentName": "DHT11 PUB Deployment",
     "components": {
         "com.alco.pub": {
-            "componentVersion": "1.0.25",
-            "runWith": {}
+            "componentVersion": "1.0.26"
         },
         "com.alco.sub": {
-            "componentVersion": "1.0.21",
-            "runWith": {}
+            "componentVersion": "1.0.22"
         }
     },
     "deploymentPolicies": {
