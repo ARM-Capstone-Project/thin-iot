@@ -3,11 +3,11 @@
     "deploymentName": "Main deployment",
     "components": {
         "com.alco.pub": {
-            "componentVersion": "LATEST",
+            "componentVersion": "1.0.25",
             "runWith": {}
         },
         "com.alco.sub": {
-            "componentVersion": "LATEST",
+            "componentVersion": "1.0.21",
             "runWith": {}
         }
     },
