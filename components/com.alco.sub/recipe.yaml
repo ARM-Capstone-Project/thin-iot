@@ -1,6 +1,6 @@
 RecipeFormatVersion: "2020-01-25"
 ComponentName: "com.alco.sub"
-ComponentVersion: "1.0.1"
+ComponentVersion: "1.0.21"
 ComponentDescription: "A component that subscribes to temperature data from AWS IoT Core"
 ComponentPublisher: "thineikhaing"
 ComponentConfiguration:
@@ -17,7 +17,7 @@ Manifests:
   - Platform:
       os: all
     Artifacts:
-      - URI: "s3://greengrass-component-artifacts-654654435122/com.alco.sub/1.0.1/com.alco.sub.zip"  # Replace with your actual S3 bucket name and component version
+      - URI: "s3://greengrass-component-artifacts-ap-southeast-1-654654435122/com.alco.sub/1.0.21/com.alco.sub.zip"  # Replace with your actual S3 bucket name and component version
         Unarchive: ZIP
     Lifecycle:
       Run: "python3 -u {artifacts:decompressedPath}/com.alco.sub/main.py"
