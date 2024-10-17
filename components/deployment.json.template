@@ -9,7 +9,7 @@
         "com.alco.sub": {
             "componentVersion": "LATEST",
             "runWith": {}
-        },
+        }
     },
     "deploymentPolicies": {
         "failureHandlingPolicy": "ROLLBACK",
